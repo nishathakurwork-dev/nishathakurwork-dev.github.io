@@ -1722,7 +1722,7 @@ a.nt-contact__row:hover {
 			<div class="nt-container">
 			<ul class="nt-stats">
 									<li class="nt-stats__item nt-reveal">
-						<span class="nt-stats__value">5+</span>
+						<span class="nt-stats__value">4.5+</span>
 						<span class="nt-stats__label">Years of experience</span>
 					</li>
 									<li class="nt-stats__item nt-reveal">
@@ -1750,7 +1750,7 @@ a.nt-contact__row:hover {
 
 		<div class="nt-about">
 			<div class="nt-about__text nt-reveal">
-									<p>Full Stack Developer with 5+ years of experience in e-commerce and website development. Skilled in WordPress, WooCommerce, Shopify, BigCommerce and CS-Cart development, theme customisation and custom feature development using PHP, Laravel, MySQL, JavaScript and jQuery.</p>
+									<p>Full Stack Developer with 4.5+ years of experience in e-commerce and website development. Skilled in WordPress, WooCommerce, Shopify, BigCommerce and CS-Cart development, theme customisation and custom feature development using PHP, Laravel, MySQL, JavaScript and jQuery.</p>
 									<p>Delivered 30+ live client projects for businesses in the USA, Canada and India, from custom WordPress sites to full e-commerce stores. I use AI tools such as Claude, ChatGPT, Cursor and GitHub Copilot to work faster and deliver cleaner code.</p>
 							</div>
 
@@ -3297,20 +3297,22 @@ a.nt-contact__row:hover {
 				var el = entry.target;
 				countObserver.unobserve( el );
 
-				// Only count values that are a number with an optional suffix,
-				// which leaves text like "USA / CA / IN" alone.
-				var parts = el.textContent.trim().match( /^(\d+)(\D*)$/ );
+				// Only count values that are a number, whole or decimal, with an
+				// optional suffix. Text like "USA / CA / IN" is left alone.
+				var parts = el.textContent.trim().match( /^(\d+(?:\.\d+)?)(\D*)$/ );
 				if ( ! parts ) {
 					return;
 				}
 
-				var target = parseInt( parts[ 1 ], 10 );
+				var target = parseFloat( parts[ 1 ] );
 				var suffix = parts[ 2 ];
+				var dot = parts[ 1 ].indexOf( '.' );
+				var decimals = dot < 0 ? 0 : parts[ 1 ].length - dot - 1;
 				var duration = 1100;
 				var started = null;
 
 				var settle = function () {
-					el.textContent = target + suffix;
+					el.textContent = parts[ 1 ] + suffix;
 				};
 
 				// requestAnimationFrame can be throttled to a standstill in
@@ -3323,7 +3325,7 @@ a.nt-contact__row:hover {
 				var tick = function ( now ) {
 					if ( null === started ) {
 						started = now;
-						el.textContent = '0' + suffix;
+						el.textContent = ( 0 ).toFixed( decimals ) + suffix;
 					}
 
 					var t = Math.min( ( now - started ) / duration, 1 );
@@ -3334,7 +3336,7 @@ a.nt-contact__row:hover {
 						return;
 					}
 
-					el.textContent = Math.round( target * ( 1 - Math.pow( 1 - t, 3 ) ) ) + suffix;
+					el.textContent = ( target * ( 1 - Math.pow( 1 - t, 3 ) ) ).toFixed( decimals ) + suffix;
 					window.requestAnimationFrame( tick );
 				};
 
